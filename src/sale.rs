@@ -101,7 +101,7 @@ impl Contract {
         buyer_id: AccountId,
     ) -> Promise {
         let sale = self.internal_remove_sale(nft_contract_id.clone(), token_id.clone());
-
+        self.internal_remove_uses(nft_contract_id.clone(), token_id.clone());
         nft_contract::nft_transfer_payout(
             buyer_id.clone(),
             token_id,

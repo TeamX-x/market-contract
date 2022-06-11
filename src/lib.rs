@@ -3,7 +3,7 @@ use near_sdk::collections::{LookupMap, UnorderedMap, UnorderedSet};
 use near_sdk::json_types::U128;
 use near_sdk::serde::{Deserialize, Serialize};
 use near_sdk::{
-    env, env::STORAGE_PRICE_PER_BYTE, ext_contract, log, near_bindgen, promise_result_as_success,
+    env, env::STORAGE_PRICE_PER_BYTE, ext_contract, near_bindgen, promise_result_as_success,
     AccountId, Balance, CryptoHash, Gas, PanicOnDefault, Promise,
 };
 

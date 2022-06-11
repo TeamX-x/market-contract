@@ -40,6 +40,19 @@ impl Contract {
         sale
     }
 
+    pub(crate) fn internal_remove_uses(
+        &mut self,
+        nft_contract_id: AccountId,
+        token_id: TokenId,
+    ) -> Uses {
+        let contract_and_token_id = format!("{}{}{}", nft_contract_id, DELIMETER, token_id);
+        let uses = self
+            .uses
+            .remove(&contract_and_token_id)
+            .expect("Not found uses");
+        uses
+    }
+
     pub(crate) fn internal_payout(&mut self, buyer_id: AccountId, price: U128) -> U128 {
         let payout_option = promise_result_as_success().and_then(|value| {
             let payout_object =

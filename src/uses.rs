@@ -100,4 +100,15 @@ impl Contract {
         uses.use_conditions = price;
         self.uses.insert(&contract_and_token_id, &uses);
     }
+
+    #[payable]
+    pub fn remove_uses(&mut self, nft_contract_id: AccountId, token_id: TokenId) {
+        assert_one_yocto();
+        let uses = self.internal_remove_uses(nft_contract_id, token_id);
+        assert_eq!(
+            env::predecessor_account_id(),
+            uses.owner_id,
+            "Must be owner id"
+        );
+    }
 }
