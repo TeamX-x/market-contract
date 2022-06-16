@@ -7,6 +7,7 @@ use near_sdk::{
     AccountId, Balance, CryptoHash, Gas, PanicOnDefault, Promise,
 };
 
+use crate::deploy::*;
 use crate::internal::*;
 use crate::nft_callback::*;
 use crate::sale::*;
@@ -15,6 +16,7 @@ use crate::uses::*;
 use crate::uses_view::*;
 use crate::utils::*;
 
+mod deploy;
 mod internal;
 mod nft_callback;
 mod sale;
