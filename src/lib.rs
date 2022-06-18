@@ -7,6 +7,7 @@ use near_sdk::{
     AccountId, Balance, CryptoHash, Gas, PanicOnDefault, Promise,
 };
 
+use crate::deploy::*;
 use crate::internal::*;
 use crate::nft_callback::*;
 use crate::sale::*;
@@ -15,6 +16,7 @@ use crate::uses::*;
 use crate::uses_view::*;
 use crate::utils::*;
 
+mod deploy;
 mod internal;
 mod nft_callback;
 mod sale;
@@ -51,14 +53,23 @@ pub struct Uses {
     pub use_conditions: UsePriceInYoctoNear,
 }
 
+#[derive(BorshSerialize, BorshDeserialize, Serialize, Deserialize)]
+#[serde(crate = "near_sdk::serde")]
+pub struct DeployedSmartContract {
+    pub contract_deploy_address: AccountId,
+    pub frontend_address: String,
+    pub contract_name: String,
+}
+
 #[near_bindgen]
 #[derive(BorshSerialize, BorshDeserialize, PanicOnDefault)]
 pub struct Contract {
     pub owner_id: AccountId,
-    // Sales token
-    pub sales: UnorderedMap<ContractAndTokenId, Sale>,
+    // Uses:
+    pub creates: LookupMap<AccountId, UnorderedSet<DeployedSmartContract>>,
     pub uses: UnorderedMap<ContractAndTokenId, Uses>,
-    // Sales list by ID
+    // Sales
+    pub sales: UnorderedMap<ContractAndTokenId, Sale>,
     pub by_owner_id: LookupMap<AccountId, UnorderedSet<ContractAndTokenId>>,
     pub by_contract_id: LookupMap<NFTContractId, UnorderedSet<TokenId>>,
     pub storage_deposit: LookupMap<AccountId, Balance>,
@@ -68,6 +79,8 @@ pub struct Contract {
 pub enum StorageKey {
     SaleKey,
     UsesKey,
+    CreateKey,
+    InnerByCreatorIdKey { account_id_hash: CryptoHash },
     ByOwnerIdKey,
     InnerByOwnerIdKey { account_id_hash: CryptoHash },
     ByContractIdKey,
@@ -83,6 +96,7 @@ impl Contract {
             owner_id,
             sales: UnorderedMap::new(StorageKey::SaleKey.try_to_vec().unwrap()),
             uses: UnorderedMap::new(StorageKey::UsesKey.try_to_vec().unwrap()),
+            creates: LookupMap::new(StorageKey::CreateKey.try_to_vec().unwrap()),
             by_owner_id: LookupMap::new(StorageKey::ByOwnerIdKey.try_to_vec().unwrap()),
             by_contract_id: LookupMap::new(StorageKey::ByContractIdKey.try_to_vec().unwrap()),
             storage_deposit: LookupMap::new(StorageKey::StorageDepositKey.try_to_vec().unwrap()),
